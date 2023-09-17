@@ -40,3 +40,119 @@ public class LoginServlet extends HttpServlet {
         out.close();
     }
 }
+
+
+
+
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class LoginServletTest {
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private HttpServletResponse response;
+
+    @Mock
+    private HttpSession session;
+
+    private LoginServlet servlet;
+    private StringWriter stringWriter;
+    private PrintWriter writer;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+        servlet = new LoginServlet();
+        stringWriter = new StringWriter();
+        writer = new PrintWriter(stringWriter);
+
+        when(request.getSession()).thenReturn(session);
+        when(response.getWriter()).thenReturn(writer);
+    }
+
+    @Test
+    public void testDoGet_CorrectCode() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn("ABC"); // User-entered code
+        when(session.getAttribute("codes")).thenReturn("ABC"); // Correct captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入正确！", responseContent);
+    }
+
+    @Test
+    public void testDoGet_IncorrectCode() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn("XYZ"); // User-entered code
+        when(session.getAttribute("codes")).thenReturn("ABC"); // Correct captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入错误！", responseContent);
+    }
+
+    @Test
+    public void testDoGet_NullSessionAttribute() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn("ABC"); // User-entered code
+        when(session.getAttribute("codes")).thenReturn(null); // No stored captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入错误！", responseContent);
+    }
+
+    @Test
+    public void testDoGet_EmptyUserEnteredCode() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn(""); // Empty user-entered code
+        when(session.getAttribute("codes")).thenReturn("ABC"); // Correct captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入错误！", responseContent);
+    }
+
+    @Test
+    public void testDoGet_MissingUserEnteredCode() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn(null); // Missing user-entered code
+        when(session.getAttribute("codes")).thenReturn("ABC"); // Correct captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入错误！", responseContent);
+    }
+
+    @Test
+    public void testDoGet_CaseInsensitiveCode() throws Exception {
+        when(request.getParameter("checkcode")).thenReturn("abc"); // User-entered code in different case
+        when(session.getAttribute("codes")).thenReturn("ABC"); // Correct captcha code
+
+        servlet.doGet(request, response);
+        writer.flush();
+
+        String responseContent = stringWriter.toString().trim();
+        assertEquals("验证码输入正确！", responseContent);
+    }
+}
+
