@@ -6,6 +6,7 @@ ChatGPT on the test
 
 ![image](https://github.com/coreglass/GitHub_ChatGPT/assets/33614974/a15c4c93-29cd-4da8-9647-d596653e07a0)
 
+![image](https://github.com/coreglass/GitHub_ChatGPT/assets/33614974/034d7049-5da9-4258-8bd0-1e11d532f9be)
 
 # Dockerfile
 ![image](https://github.com/coreglass/GitHub_ChatGPT/assets/33614974/660f300f-69c2-434b-9567-987b8820e514)
